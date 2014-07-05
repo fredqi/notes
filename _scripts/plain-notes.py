@@ -1,11 +1,12 @@
+#!/usr/bin/env python
 ### plain-notes.py ---
 ##
 ## Filename: plain-notes.py
 ## Author: Fred Qi
 ## Created: 2014-07-03 18:01:48(+0400)
 ##
-## Last-Updated: 2014-07-05 18:18:40(+0400) [by Fred Qi]
-##     Update #: 747
+## Last-Updated: 2014-07-05 22:48:59(+0400) [by Fred Qi]
+##     Update #: 781
 ######################################################################
 ##
 ### Commentary:
@@ -34,6 +35,8 @@ from PIL import Image
 from PIL.ImageFileIO import ImageFileIO
 
 import argparse
+
+from pocket import pocket
 
 
 def download_images(urls, folder):
@@ -84,22 +87,6 @@ def patch_image_alt(html):
 
     return html
 
-def safe_unicode(obj, * args):
-    """ return the unicode representation of obj """
-    try:
-        return unicode(obj, * args)
-    except UnicodeDecodeError:
-        # obj is byte string
-        ascii_text = str(obj).encode('string_escape')
-        return unicode(ascii_text)
-
-def safe_str(obj):
-    """ return the byte string representation of obj """
-    try:
-        return str(obj)
-    except UnicodeEncodeError:
-        # obj is unicode
-        return unicode(obj).encode('unicode_escape')
 
 def download_html_as_text(url, filename=None, format_to='rst'):
     """Download HTML content from url and convert it to plain text."""
@@ -150,9 +137,28 @@ def download_html_as_text(url, filename=None, format_to='rst'):
     txtfile.close()
 
 
+def download_pocket_favorite():
+    pi = pocket()
+    pi.load_token()
+    list_favorite = pi.retrieve_favorite()
+    
+    for key, val in list_favorite['list'].iteritems():
+        title, url = pi.extract_title_url(val)
+        if url.find('blogspot') > 0:
+            print 'Not supported [blogspot]:', url
+            continue
+        print title, '\n  Downloading from', url
+        download_html_as_text(url)
+        pi.modify_items([key], 'unfavorite')
+        pi.modify_items([key], 'archive')
+
+
 if '__main__' == __name__:
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('-s', '--output-style',
+                        nargs=1, default='rst',
+                        help='Style of the output plain text.')
     subparsers = parser.add_subparsers(title='List of subcommands')
     parser_url = subparsers.add_parser('url')
     parser_url.add_argument('urls',
@@ -161,9 +167,12 @@ if '__main__' == __name__:
     parser_url.add_argument('-f', '--filename',
                             metavar='FILE', nargs=1,
                             help='List of URLs to be processed.')
+    parser_pocket = subparsers.add_parser('pocket')
+
     args = parser.parse_args()
 
     if hasattr(args, 'urls'):
+        print args
         if args.filename and 1 == len(args.urls):
             print 'Downloading contents from:'
             print '   ', args.urls[0]
@@ -173,7 +182,10 @@ if '__main__' == __name__:
                 print 'Downloading contents from:'
                 print '   ', url
                 download_html_as_text(url)
-    
+    else:
+        # Get URLs from pocket favorite list
+        download_pocket_favorite()
+        
 
 ######################################################################
 ### plain-notes.py ends here
