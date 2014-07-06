@@ -19,3 +19,6 @@
 [submodule "ipynb-tutorials/nbconvert-examples"]
 	path = ipynb-tutorials/nbconvert-examples
 	url = https://github.com/ipython/nbconvert-examples.git
+[submodule "ipynb-tutorials/scientific-python-lectures"]
+	path = ipynb-tutorials/scientific-python-lectures
+	url = https://github.com/jrjohansson/scientific-python-lectures.git
