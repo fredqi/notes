@@ -1,0 +1,21 @@
+[submodule "ipynb-tutorials/parallel_ml"]
+	path = ipynb-tutorials/parallel_ml
+	url = https://github.com/ogrisel/parallel_ml_tutorial.git
+[submodule "ipynb-tutorials/sklearn_pycon2014"]
+	path = ipynb-tutorials/sklearn_pycon2014
+	url = https://github.com/jakevdp/sklearn_pycon2014.git
+[submodule "ipynb-tutorials/ipython-notebook"]
+	path = ipynb-tutorials/ipython-notebook
+	url = https://github.com/jakevdp/OpenVisConf2014.git
+[submodule "ipynb-tutorials/fourier-python"]
+	path = ipynb-tutorials/fourier-python
+	url = https://github.com/calebmadrigal/FourierTalkOSCON.git
+[submodule "ipynb-tutorials/sympy-scipy2013"]
+	path = ipynb-tutorials/sympy-scipy2013
+	url = https://github.com/certik/scipy-2013-tutorial.git
+[submodule "ipynb-tutorials/pandas-cookbook"]
+	path = ipynb-tutorials/pandas-cookbook
+	url = https://github.com/jvns/pandas-cookbook.git
+[submodule "ipynb-tutorials/nbconvert-examples"]
+	path = ipynb-tutorials/nbconvert-examples
+	url = https://github.com/ipython/nbconvert-examples.git
