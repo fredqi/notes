@@ -5,8 +5,8 @@
 ## Author: Fred Qi
 ## Created: 2014-07-03 18:01:48(+0400)
 ##
-## Last-Updated: 2014-07-05 22:48:59(+0400) [by Fred Qi]
-##     Update #: 781
+## Last-Updated: 2014-07-06 10:16:07(+0400) [by Fred Qi]
+##     Update #: 800
 ######################################################################
 ##
 ### Commentary:
@@ -39,7 +39,7 @@ import argparse
 from pocket import pocket
 
 
-def download_images(urls, folder):
+def download_images(urls, folder, retry=3):
     """Download images from given URLs."""
 
     if os.path.exists(folder) and not os.path.isdir(folder):
@@ -51,16 +51,21 @@ def download_images(urls, folder):
     headers={'User-Agent': 'Mozilla Firefox for Ubuntu canonical - 1.0'}
     for fn, url in urls:
         print 'Downloading', fn, url
-        req = urllib2.Request(url, headers=headers)
-        con = urllib2.urlopen(req)
-        data = con.read()
-        img = Image.open(ImageFileIO(StringIO(data)))
-        imgext = '%s' % img.format
-        imgfn, _ = os.path.splitext(fn)
-        imgfn = fn + '.' + imgext.lower()
-        imgfn = os.path.join(folder, imgfn)
-        images.append((imgfn, url))
-        img.save(imgfn)
+        for i in range(retry):
+            try:
+                req = urllib2.Request(url, headers=headers)
+                con = urllib2.urlopen(req)
+                data = con.read()
+                img = Image.open(ImageFileIO(StringIO(data)))
+                imgext = '%s' % img.format
+                imgfn, _ = os.path.splitext(fn)
+                imgfn = fn + '.' + imgext.lower()
+                imgfn = os.path.join(folder, imgfn)
+                images.append((imgfn, url))
+                img.save(imgfn)
+                break
+            except urllib2.HTTPError as e:
+                print e.message()
 
     return images
 
@@ -79,10 +84,11 @@ def patch_image_alt(html):
         if img_url and alt_txt:
             img_url = img_url.group(1)
             alt_txt = alt_txt.group(1).replace(' ', '-')
-            print alt_txt, img_url
+            # print alt_txt, img_url
             url_new = img_tmpl % (img_url.encode('utf-8'),
                                   alt_txt.encode('utf-8'),
                                   idx + 1)
+            # print url_new, url
             html = html.replace(url, url_new)
 
     return html
@@ -172,7 +178,6 @@ if '__main__' == __name__:
     args = parser.parse_args()
 
     if hasattr(args, 'urls'):
-        print args
         if args.filename and 1 == len(args.urls):
             print 'Downloading contents from:'
             print '   ', args.urls[0]
